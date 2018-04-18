@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<title>Student Edit</title>
+
+</head>
+<body>
+
+	<script src="js/jquery-3.1.1.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+
+	<script>
+		$(document).ready(function() {
+			var urlParams = new URLSearchParams(
+					window.location.search);
+			//alert("api/teacher/item?id=" + urlParams.get('id'));
+					//getTeacher();
+			var teacher, teachers, student;
+			$.ajax({
+				type : "GET",
+				url : "api/student/item?id="
+						+ urlParams.get('id'),
+				success : function(data) {
+					student = data;
+					$.ajax({
+						type : "GET",
+						url : "api/student/teacher?id="+urlParams.get('id'),
+						success : function(data) {
+							teacher = data;
+						},
+						error : function(data) {
+							alert("Some error occured.");
+						}
+					});
+					$.ajax({
+						type : "GET",
+						url : "api/teacher/items",
+						success : function(data) {
+							teachers = data;
+							var select='<select id="teacherlist">';
+							for(var i = 0; i < teachers.length; i++){
+								if(teachers[i].name === teacher){
+									select += '<option value="'+teachers[i].name+'" selected>'+teachers[i].name+'</option>';
+								}else{
+									select += '<option value="'+teachers[i].name+'">'+teachers[i].name+'</option>';}
+							}
+							select += '</select>';
+							getSelect(student, select);
+						},
+						error : function(data) {
+							alert("Some error occured.");
+						}
+					});
+				},
+				error : function(data) {
+					alert("salam");
+					alert("Some error occured.");
+				}
+			});
+			
+		});
+		function getSelect(data, select){
+			var content = '<input type="text" id="id" value='+data.id+' disabled><br><input type="text" id="name" value='+data.name+'><br><input type="text" id="dprt" value='+data.dprt+'><br>'+select+'<br><button onclick="updateItem();" type="button">edit</button>';
+			$('body').html(content);
+		}
+		function updateItem() {
+			var urlParams = new URLSearchParams(window.location.search);
+			$.ajax({
+				type : "POST",
+				contentType : 'application/json',
+				url : "api/student/edit?id="+urlParams.get('id'),
+				data : JSON.stringify({
+					"id" : $('#id').val(),
+					"name" : $('#name').val(),
+					"dprt" : $('#dprt').val()
+				}),
+				success : function(data) {
+					$.ajax({
+						type : "POST",
+						contentType : 'application/json',
+						url : "api/student/setTeacher?id="+urlParams.get('id'),
+						data : $("#teacherlist").val(),
+						success : function(data) {
+							window.location="studentList.html";
+						},
+						error : function(data) {
+							alert("Some error occured.");
+						}
+					});
+				},
+				error : function(data) {
+					alert("Some error occured.");
+				}
+			});
+		}
+	</script>
+</body>
+</html>

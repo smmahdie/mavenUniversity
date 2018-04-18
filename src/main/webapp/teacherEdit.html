@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<title>Teacher Edit</title>
+
+</head>
+<body>
+	<!-- <div class="container">
+		<div class="col-lg-5">
+			<div class="row">
+				<div class="col-xs-6 col-sm-6 col-md-6">
+					<div class="form-group">
+						<input type="text" name="uid" id="uid" class="form-control input-sm" placeholder="id">
+					</div>
+				</div>
+				<div class="col-xs-6 col-sm-6 col-md-6">
+					<div class="form-group">
+						<input type="text" name="uid" id="uid" class="form-control input-sm" placeholder="id"><input type="text" name="uname" id="uname" class="form-control input-sm" placeholder="Full Name">
+					</div>
+				</div>
+				<div class="col-xs-6 col-sm-6 col-md-6">
+					<div class="form-group">
+						<input type="text" name="uid" id="uid" class="form-control input-sm" placeholder="id"><input type="text" name="uname" id="uname" class="form-control input-sm" placeholder="Full Name"><input type="text" name="udprt" id="udprt" class="form-control input-sm" placeholder="Department">
+					</div>
+				</div>
+			</div>
+			<button onclick="addStudent();" type="button" class="btn btn-success btn-block">Add</button>
+			<div class="text-center" id="resp" style="margin-top: 14px;"></div>
+		</div>
+	</div>
+	<br>
+	<br>
+	<br>
+	<a href="addTeacher.html">Add a teacher</a> -->
+
+	<script src="js/jquery-3.1.1.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+
+	<script>
+		$(document).ready(function() {
+			var content = "";
+			var urlParams = new URLSearchParams(
+					window.location.search);
+			//alert("api/teacher/item?id=" + urlParams.get('id'));
+			$.ajax({
+				type : "GET",
+				url : "api/teacher/item?id="
+						+ urlParams.get('id'),
+				success : function(data) {
+					content = '<input type="text" id="id" value='+data.id+' disabled><br><input type="text" id="name" value='+data.name+'><br><input type="text" id="degree" value='+data.degree+'><br><button onclick="updateItem();" type="button">edit</button>';
+					$('body').html(content);
+				},
+				error : function(data) {
+					alert("Some error occured.");
+				}
+			});
+		});
+
+		function updateItem() {
+			var urlParams = new URLSearchParams(window.location.search);
+			$.ajax({
+				type : "POST",
+				contentType : 'application/json',
+				url : "api/teacher/edit?id="+urlParams.get('id'),
+				data : JSON.stringify({
+					"id" : $('#id').val(),
+					"name" : $('#name').val(),
+					"degree" : $('#degree').val()
+				}),
+				success : function(data) {
+					window.location="teacherList.html";
+				},
+				error : function(data) {
+					alert("Some error occured.");
+				}
+			});
+		}
+	</script>
+</body>
+</html>

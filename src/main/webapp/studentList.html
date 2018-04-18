@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<title>Student List</title>
+
+</head>
+<body id="body">
+	<table class="table">
+		<thead>
+			<tr class="bg-info">
+				<th>Id</th>
+				<th>Name</th>
+				<th>Department</th>
+				<th>Teacher Name</th>
+			</tr>
+		</thead>
+		<tbody id="tbl">
+		</tbody>
+	</table>
+	<br>
+	<br>
+	<br>
+	<a href="studentAdd.html">Add a student</a>
+
+	<script src="js/jquery-3.1.1.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+
+	<script>
+		$(document).ready(function() {
+			var students;
+			$.ajax({
+				type : "GET",
+				url : "api/student/items",
+				success : function(data) {
+					students = data;
+					$.ajax({
+						type : "GET",
+						url : "api/student/teachers",
+						success : function(data) {
+							getTeachers(students, data);
+						},
+						error : function(data) {
+							alert("Some error occured.");
+						}
+					});
+				},
+				error : function(data) {
+					alert("Some error occured.");
+				}
+			});
+			
+		});
+		function getTeachers(students, teachers) {
+			for(var i=0; i < students.length; i++) {
+				
+				var table = document.getElementById("tbl");
+				var row = table.insertRow(i);
+				var cell1 = row.insertCell(0);
+				var cell2 = row.insertCell(1);
+				var cell3 = row.insertCell(2);
+				var cell4 = row.insertCell(3);
+				var cell5 = row.insertCell(4);
+
+				cell1.innerHTML = students[i].id;
+				cell2.innerHTML = students[i].name;
+				cell3.innerHTML = students[i].dprt;
+				cell4.innerHTML = teachers[i];
+				cell5.innerHTML = "<button onclick='updateItem(this);' class='btn btn-sm btn-info'>Update</button>"
+						+ "<button onclick='deleteItem(this);' class='btn btn-sm btn-danger'>Delete</button>";
+			}
+		}
+		function deleteItem(element) {
+			$.ajax({
+				type : "GET",
+				url : "api/student/delete?id=" + $(element).closest("tr").find("td:first").text(),
+				success : function(data) {
+					$(element).closest("tr").remove();
+				},
+				error : function(data) {
+					alert("Some error occured.");
+				}
+			});
+		}
+		function updateItem(element) {
+			window.location="studentEdit.html?id=" + $(element).closest("tr").find("td:first").text();
+		}
+	</script>
+</body>
+</html>
